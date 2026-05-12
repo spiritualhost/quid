@@ -26,6 +26,7 @@ fn pinpoint(ip: IpAddr) {
 
     match ping::new(target_ip).send() {
         Ok(_) => println!("The IP address has been found! {}", ip),
-        Err(e) => println!("The IP address {} has not been found: {}", ip, e),
+        Err(e) => eprintln!("The IP address {} has not been found: {}", ip, e),
     } 
 }
+
