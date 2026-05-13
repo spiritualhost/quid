@@ -1,5 +1,6 @@
 use local_ip_address::local_ip;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use tabled::{Table, Tabled};
 
 fn main() {
 
@@ -18,6 +19,7 @@ fn main() {
     let bad_ip = "192.168.200.254".parse().unwrap();
     pinpoint(bad_ip);
 
+    draw_state();
 }
 
 // Pinpoint that an IP exists on the accessible subnet (needs better error handling)
@@ -30,3 +32,23 @@ fn pinpoint(ip: IpAddr) {
     } 
 }
 
+// Draw a table of the current state
+fn draw_state(){
+    #[derive(Tabled)]
+    struct State {
+        destination_ip: &'static str,
+        source_ip: &'static str,  
+        port: u16,
+    }
+    
+    // Actual live data populates here
+    let curr_state = vec![
+        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.0", port: 80 },
+        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.1", port: 443 },
+        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.2", port: 80 },
+    ];
+
+    let table = Table::new(curr_state);
+
+    println!("{}", table);
+}
