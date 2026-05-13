@@ -1,6 +1,7 @@
 use local_ip_address::local_ip;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use tabled::{Table, Tabled};
+use std::{thread, time};
 
 fn main() {
 
@@ -19,7 +20,19 @@ fn main() {
     let bad_ip = "192.168.200.254".parse().unwrap();
     pinpoint(bad_ip);
 
-    draw_state();
+    // Eventually add time constraints here to only run for a certain period
+    let mut counter = 0; 
+    while counter < 10 {
+        // Clear the terminal
+        let sleeptime = time::Duration::from_secs(5);
+        thread::sleep(sleeptime);
+        clearscreen::clear().expect("Failed to clear screen");
+        
+        println!("Counter: {}", counter); 
+        draw_state();
+        
+        counter += 1; 
+    }
 }
 
 // Pinpoint that an IP exists on the accessible subnet (needs better error handling)

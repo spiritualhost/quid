@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+clearscreen = "4.0.6"
 local-ip-address = "0.6.12"
 ping = "0.7.1"
 tabled = "0.20.0"
