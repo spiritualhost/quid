@@ -132,20 +132,38 @@ fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
 }
 
 // Draw a table of the current state
-fn draw_state(_connections: &Vec<SocketInfo>){
+fn draw_state(connections: &Vec<SocketInfo>){
     #[derive(Tabled)]
     struct State {
-        destination_ip: &'static str,
-        source_ip: &'static str,  
+        destination_ip: String,
+        source_ip: String,  
         port: u16,
+        remote_port: u16,
+        state: String
     }
     
     // Actual live data populates here
-    let curr_state = vec![
-        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.0", port: 80 },
-        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.1", port: 443 },
-        State { destination_ip: "192.168.0.0", source_ip: "10.0.0.2", port: 80 },
-    ];
+    let mut curr_state: Vec<State> = Vec::new();
+
+    for info in connections {
+        
+        // Destructure through the enum first
+        if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
+            
+            // Populate a structure to append that individual State to the table
+            let row_state = State { 
+                destination_ip: tcp_si.local_addr.to_string(), 
+                source_ip: tcp_si.remote_addr.to_string(), 
+                port: tcp_si.local_port, 
+                remote_port: tcp_si.remote_port, 
+                state: tcp_si.state.to_string() 
+            };
+
+            // Append state to curr_state amalgamation vector
+            curr_state.push(row_state);
+
+        }
+    }
 
     let table = Table::new(curr_state);
 
