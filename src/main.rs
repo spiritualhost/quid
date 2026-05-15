@@ -19,7 +19,7 @@ struct Args {
 }
 
 fn main() {
-    let _args = Args::parse();
+    let args = Args::parse();
 
     // Get localhost addresses for IPv6 and IPv4
     let localhost_v4 = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
@@ -36,21 +36,21 @@ fn main() {
     let bad_ip = "192.168.200.254".parse().unwrap();
     pinpoint(bad_ip);
 
-    // Eventually add time constraints here to only run for a certain period
-    let mut counter = 0; 
-    while counter < 10 {
-        // Clear the terminal
-        let sleeptime = time::Duration::from_secs(5);
-        thread::sleep(sleeptime);
-        clearscreen::clear().expect("Failed to clear screen");
+    // Time constraints so the survey runs for a predetermined period
+    let between_survey = time::Duration::from_secs(args.t_between as u64);
+    let survey_duration = time::Duration::from_secs(args.survey);
+    let start_time = std::time::Instant::now(); 
 
+    while start_time.elapsed() < survey_duration {
         // Placeholder for the time being
         socket_map();
         
-        println!("Counter: {}", counter); 
         draw_state();
-        
-        counter += 1; 
+
+        // Clear the terminal
+        thread::sleep(between_survey);
+
+        clearscreen::clear().expect("Failed to clear screen");
     }
 }
 
@@ -64,13 +64,22 @@ fn pinpoint(ip: IpAddr) {
     } 
 }
 
+// Match values that are useful according to our configuration
+fn fine_value (){
+    println!("Fine value.");
+}
+
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
 fn socket_map(){
     println!("Socket map!");
-    
+
     let af_flags = AddressFamilyFlags::IPV4 | AddressFamilyFlags::IPV6;
     let proto_flags = ProtocolFlags::TCP | ProtocolFlags::UDP;
     let sockets_info = get_sockets_info(af_flags, proto_flags).unwrap();
+
+    //Temp placeholder
+    fine_value();
+
     for si in sockets_info {
         match si.protocol_socket_info {
             ProtocolSocketInfo::Tcp(tcp_si) => println!(
