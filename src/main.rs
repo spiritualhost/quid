@@ -2,8 +2,23 @@ use local_ip_address::local_ip;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use tabled::{Table, Tabled};
 use std::{thread, time};
+use clap::Parser; 
+
+// Parse command line arguments
+#[derive(Parser, Debug)]
+#[command(name = "quid", version = "0.1.0", about = "Perform helpful network survey for QuickBooks server.")]
+struct Args {
+    // Amount of time to survey for
+    #[arg(short, long)]
+    survey: u64,
+
+    // Amount of time between scans
+    #[arg(short, long, default_value_t = 1)]
+    t_between: u8,
+}
 
 fn main() {
+    let _args = Args::parse();
 
     // Get localhost addresses for IPv6 and IPv4
     let localhost_v4 = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
@@ -27,6 +42,9 @@ fn main() {
         let sleeptime = time::Duration::from_secs(5);
         thread::sleep(sleeptime);
         clearscreen::clear().expect("Failed to clear screen");
+
+        // Placeholder for the time being
+        socket_map();
         
         println!("Counter: {}", counter); 
         draw_state();
@@ -43,6 +61,11 @@ fn pinpoint(ip: IpAddr) {
         Ok(_) => println!("The IP address has been found! {}", ip),
         Err(e) => eprintln!("The IP address {} has not been found: {}", ip, e),
     } 
+}
+
+// Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
+fn socket_map(){
+    println!("Socket map!");
 }
 
 // Draw a table of the current state
