@@ -109,7 +109,6 @@ fn fine_value (si: &SocketInfo, ports: &Vec<u16>) -> bool{
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
 fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
-    println!("Socket map!");
 
     let af_flags = AddressFamilyFlags::IPV4 | AddressFamilyFlags::IPV6;
     let proto_flags = ProtocolFlags::TCP | ProtocolFlags::UDP;
@@ -122,7 +121,6 @@ fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
     for si in sockets_info {
         if fine_value(&si, &ports) == true {
             //append to proper vector
-            println!("Appending to proper socket vector.");
             tcp_info.push(si); 
         }
     }
