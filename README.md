@@ -52,7 +52,7 @@ The program needs a survey time to run in seconds, which will be the period for 
 At the bare minimum:
 
 ```powershell
-.\quid.exe -s|--survey {survey_time_seconds}
+.\target\release\quid.exe -s|--survey {survey_time_seconds}
 ```
 
 Each iteration will show the state of the server's connections from various remote IPs:
