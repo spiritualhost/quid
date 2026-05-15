@@ -42,14 +42,14 @@ fn main() {
     let start_time = std::time::Instant::now(); 
 
     while start_time.elapsed() < survey_duration {
-        // Placeholder for the time being
+        // Placeholder for the time being -- map the sockets to a structure the draw_state function can use to make a table
         socket_map();
-        
+    
+        // Placeholder for the time being -- draw table of current socket state
         draw_state();
 
-        // Clear the terminal
+        // Clear the terminal after a wait
         thread::sleep(between_survey);
-
         clearscreen::clear().expect("Failed to clear screen");
     }
 }
@@ -65,8 +65,25 @@ fn pinpoint(ip: IpAddr) {
 }
 
 // Match values that are useful according to our configuration
-fn fine_value (){
+fn fine_value (si: &SocketInfo) -> bool{
     println!("Fine value.");
+    match &si.protocol_socket_info {
+        ProtocolSocketInfo::Tcp(tcp_si) => println!(
+            "TCP {}:{} -> {}:{} {:?} - {}",
+            tcp_si.local_addr,
+            tcp_si.local_port,
+            tcp_si.remote_addr,
+            tcp_si.remote_port,
+            si.associated_pids,
+            tcp_si.state
+        ),
+
+        ProtocolSocketInfo::Udp(udp_si) => println!(
+            "UDP {}:{} -> *:* {:?}",
+            udp_si.local_addr, udp_si.local_port, si.associated_pids
+        ),
+    }
+    return true;
 }
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
@@ -77,26 +94,17 @@ fn socket_map(){
     let proto_flags = ProtocolFlags::TCP | ProtocolFlags::UDP;
     let sockets_info = get_sockets_info(af_flags, proto_flags).unwrap();
 
-    //Temp placeholder
-    fine_value();
+    // Set up vectors for TCP and UDP info
+    let mut tcp_info: Vec<TcpSocketInfo> = Vec::new();
+    let mut udp_info: Vec<UdpSocketInfo> = Vec::new();
 
     for si in sockets_info {
-        match si.protocol_socket_info {
-            ProtocolSocketInfo::Tcp(tcp_si) => println!(
-                "TCP {}:{} -> {}:{} {:?} - {}",
-                tcp_si.local_addr,
-                tcp_si.local_port,
-                tcp_si.remote_addr,
-                tcp_si.remote_port,
-                si.associated_pids,
-                tcp_si.state
-            ),
-            ProtocolSocketInfo::Udp(udp_si) => println!(
-                "UDP {}:{} -> *:* {:?}",
-                udp_si.local_addr, udp_si.local_port, si.associated_pids
-            ),
-        }
+        //Temp placeholder
+        fine_value(&si);
     }
+
+    // Return a vector compatible with the table drawing function
+    return;  
 }
 
 // Draw a table of the current state
