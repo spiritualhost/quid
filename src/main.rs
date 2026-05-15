@@ -54,6 +54,7 @@ fn main() {
     let survey_duration = time::Duration::from_secs(args.survey);
     let start_time = std::time::Instant::now(); 
 
+    // The main progression of the loop here
     while start_time.elapsed() < survey_duration {
         // Placeholder for the time being -- map the sockets to a structure the draw_state function can use to make a table
         socket_map(&ports);
@@ -81,23 +82,26 @@ fn pinpoint(ip: IpAddr) {
 fn fine_value (si: &SocketInfo, ports: &Vec<i64>) -> bool{
     println!("Fine value.");
 
+    // Match socket info value to Tcp or Udp variants
     match &si.protocol_socket_info {
-        ProtocolSocketInfo::Tcp(tcp_si) => println!(
-            "TCP {}:{} -> {}:{} {:?} - {}",
-            tcp_si.local_addr,
-            tcp_si.local_port,
-            tcp_si.remote_addr,
-            tcp_si.remote_port,
-            si.associated_pids,
-            tcp_si.state
-        ),
+        ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port.into()) => return true,
+            //"TCP {}:{} -> {}:{} {:?} - {}",
+            //tcp_si.local_addr,
+            //tcp_si.local_port,
+            //tcp_si.remote_addr,
+            //tcp_si.remote_port,
+            //si.associated_pids,
+            //tcp_si.state
+        
+        ProtocolSocketInfo::Tcp(_) => return false,
 
-        ProtocolSocketInfo::Udp(udp_si) => println!(
-            "UDP {}:{} -> *:* {:?}",
-            udp_si.local_addr, udp_si.local_port, si.associated_pids
-        ),
+        //ProtocolSocketInfo::Udp(udp_si) => println!(
+        //    "UDP {}:{} -> *:* {:?}",
+        //    udp_si.local_addr, udp_si.local_port, si.associated_pids
+        //),
+
+        ProtocolSocketInfo::Udp(_) => return false,
     }
-    return true;
 }
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
@@ -109,12 +113,15 @@ fn socket_map(ports: &Vec<i64>){
     let sockets_info = get_sockets_info(af_flags, proto_flags).unwrap();
 
     // Set up vectors for TCP and UDP info
-    let mut tcp_info: Vec<TcpSocketInfo> = Vec::new();
-    let mut udp_info: Vec<UdpSocketInfo> = Vec::new();
+    let mut tcp_info: Vec<SocketInfo> = Vec::new();
+    //let mut udp_info: Vec<UdpSocketInfo> = Vec::new();
 
     for si in sockets_info {
-        //Temp placeholder
-        fine_value(&si, &ports);
+        if fine_value(&si, &ports) == true {
+            //append to proper vector
+            println!("Appending to proper socket vector.");
+            tcp_info.push(si); 
+        }
     }
 
     // Return a vector compatible with the table drawing function
