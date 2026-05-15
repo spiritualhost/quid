@@ -83,7 +83,9 @@ fn fine_value (si: &SocketInfo, ports: &Vec<u16>) -> bool{
 
     // Match socket info value to Tcp or Udp variants
     match &si.protocol_socket_info {
-        ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port) => return true,
+        
+        //Check for proper port and only return ESTABLISHED connections
+        ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port) && matches!(tcp_si.state, TcpState::Established) => return true,
             //"TCP {}:{} -> {}:{} {:?} - {}",
             //tcp_si.local_addr,
             //tcp_si.local_port,
