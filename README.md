@@ -30,15 +30,25 @@ Options:
 
 The program needs a survey time to run in seconds, which will be the period for which the scan takes place, with an option to define a time between each scan (which will otherwise happen every second for the survey period).
 
+At the bare minimum:
+
+```powershell
+.\quid.exe -s|--survey {survey_time_seconds}
+```
+
 Each iteration will show the state of the server's connections from various remote IPs:
 
 ```powershell
-+----------------+-------------+------+-------------+-------------+
-| destination_ip | source_ip   | port | remote_port | state       |
-+----------------+-------------+------+-------------+-------------+
-| 192.168.10.200 | 172.25.0.68 | 445  | 49426       | ESTABLISHED |
-+----------------+-------------+------+-------------+-------------+
++----------------+-------------+------+-------------+-------------+-----+
+| destination_ip | source_ip   | port | remote_port | state       | pid |
++----------------+-------------+------+-------------+-------------+-----+
+| 192.168.10.200 | 172.25.0.68 | 445  | 49426       | ESTABLISHED | 4   |
++----------------+-------------+------+-------------+-------------+-----+
 ```
+
+## Configuration
+
+Configuration of specific focus ports can be done in the `src/config.toml`. This is also where additional diagnostic fields are expressed as booleans to expand the capabilities of analyzing each connection.
 
 ## Future Improvements
 
