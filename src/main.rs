@@ -6,6 +6,8 @@ use tabled::{Table, Tabled};
 use std::{thread, time};
 use clap::Parser; 
 
+mod diagnostics;
+
 // Parse command line arguments
 #[derive(Parser, Debug)]
 #[command(name = "quid", version = "0.1.0", about = "Perform helpful network survey for QuickBooks server.")]
@@ -151,8 +153,6 @@ fn draw_state(connections: &Vec<SocketInfo>){
         // Destructure through the enum first
         if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
 
-            println!("{:?}", info.associated_pids); 
-
             //Maybe do some further diagnostics here?
             
             // Populate a structure to append that individual State to the table
@@ -167,7 +167,6 @@ fn draw_state(connections: &Vec<SocketInfo>){
 
             // Append state to curr_state amalgamation vector
             curr_state.push(row_state);
-
         }
     }
 
