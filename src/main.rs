@@ -57,10 +57,10 @@ fn main() {
     // The main progression of the loop here
     while start_time.elapsed() < survey_duration {
         // Placeholder for the time being -- map the sockets to a structure the draw_state function can use to make a table
-        socket_map(&ports);
+        let connections = socket_map(&ports);
     
         // Placeholder for the time being -- draw table of current socket state
-        draw_state();
+        draw_state(&connections);
 
         // Clear the terminal after a wait
         thread::sleep(between_survey);
@@ -83,7 +83,7 @@ fn fine_value (si: &SocketInfo, ports: &Vec<u16>) -> bool{
 
     // Match socket info value to Tcp or Udp variants
     match &si.protocol_socket_info {
-        
+
         //Check for proper port and only return ESTABLISHED connections
         ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port) && matches!(tcp_si.state, TcpState::Established) => return true,
             //"TCP {}:{} -> {}:{} {:?} - {}",
@@ -106,7 +106,7 @@ fn fine_value (si: &SocketInfo, ports: &Vec<u16>) -> bool{
 }
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
-fn socket_map(ports: &Vec<u16>){
+fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
     println!("Socket map!");
 
     let af_flags = AddressFamilyFlags::IPV4 | AddressFamilyFlags::IPV6;
@@ -127,12 +127,12 @@ fn socket_map(ports: &Vec<u16>){
 
     println!("{:#?}", tcp_info);
 
-    // Return a vector compatible with the table drawing function
-    return;  
+    // Return a Vec<SocketInfo> with returned values
+    return tcp_info;  
 }
 
 // Draw a table of the current state
-fn draw_state(){
+fn draw_state(_connections: &Vec<SocketInfo>){
     #[derive(Tabled)]
     struct State {
         destination_ip: &'static str,
