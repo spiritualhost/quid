@@ -29,9 +29,9 @@ fn main() {
         .build()
         .unwrap();
 
-    let ports: Vec<i64>  = configurations.get_array("ports").unwrap()
+    let ports: Vec<u16>  = configurations.get_array("ports").unwrap()
         .into_iter()
-        .map(|v| v.into_int().unwrap())
+        .map(|v| v.into_int().unwrap() as u16)
         .collect();    
 
     // Get localhost addresses for IPv6 and IPv4
@@ -79,12 +79,11 @@ fn pinpoint(ip: IpAddr) {
 }
 
 // Match values that are useful according to our configuration
-fn fine_value (si: &SocketInfo, ports: &Vec<i64>) -> bool{
-    println!("Fine value.");
+fn fine_value (si: &SocketInfo, ports: &Vec<u16>) -> bool{
 
     // Match socket info value to Tcp or Udp variants
     match &si.protocol_socket_info {
-        ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port.into()) => return true,
+        ProtocolSocketInfo::Tcp(tcp_si) if ports.contains(&tcp_si.local_port) => return true,
             //"TCP {}:{} -> {}:{} {:?} - {}",
             //tcp_si.local_addr,
             //tcp_si.local_port,
@@ -105,7 +104,7 @@ fn fine_value (si: &SocketInfo, ports: &Vec<i64>) -> bool{
 }
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
-fn socket_map(ports: &Vec<i64>){
+fn socket_map(ports: &Vec<u16>){
     println!("Socket map!");
 
     let af_flags = AddressFamilyFlags::IPV4 | AddressFamilyFlags::IPV6;
@@ -123,6 +122,8 @@ fn socket_map(ports: &Vec<i64>){
             tcp_info.push(si); 
         }
     }
+
+    println!("{:#?}", tcp_info);
 
     // Return a vector compatible with the table drawing function
     return;  
