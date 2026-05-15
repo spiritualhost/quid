@@ -12,3 +12,38 @@ Rust was chosen for its exceptional efficiency as a low-overhead programming lan
 
 quid (**Qu**ickBooks **Id**entifier) can run either in the command line or as an executable, whichever is most convenient. The default action of the program is to perform a survey of network sockets (TCP/UDP) for all current connections to the QuickBooks server ports. This allows us to get a better idea of the current network status of the server, by connection, by multiple granular diagnostics.
 
+Run the following to get the options for quid:
+
+```powershell
+$ .\quid.exe --help
+
+Perform helpful network survey for QuickBooks server.
+
+Usage: quid.exe [OPTIONS] --survey <SURVEY>
+
+Options:
+  -s, --survey <SURVEY>        
+  -t, --t-between <T_BETWEEN>  [default: 1]
+  -h, --help                   Print help
+  -V, --version                Print version
+```
+
+The program needs a survey time to run in seconds, which will be the period for which the scan takes place, with an option to define a time between each scan (which will otherwise happen every second for the survey period).
+
+Each iteration will show the state of the server's connections from various remote IPs:
+
+```powershell
++----------------+-----------+------+
+| destination_ip | source_ip | port |
++----------------+-----------+------+
+| 192.168.0.0    | 10.0.0.0  | 80   |
++----------------+-----------+------+
+| 192.168.0.0    | 10.0.0.1  | 443  |
++----------------+-----------+------+
+| 192.168.0.0    | 10.0.0.2  | 80   |
++----------------+-----------+------+
+```
+
+## Future Improvements
+
+* Integration of UDP in a far more robust way
