@@ -1,3 +1,4 @@
+use config::Config;
 use local_ip_address::local_ip;
 use netstat::*;
 use std::{net::{IpAddr, Ipv4Addr, Ipv6Addr}};
@@ -19,7 +20,19 @@ struct Args {
 }
 
 fn main() {
+    // Set up args from parsed CLI
     let args = Args::parse();
+
+    // Set up read from config
+    let configurations = Config::builder()
+        .add_source(config::File::with_name("src/config"))
+        .build()
+        .unwrap();
+
+    let ports: Vec<i64>  = configurations.get_array("ports").unwrap()
+        .into_iter()
+        .map(|v| v.into_int().unwrap())
+        .collect();    
 
     // Get localhost addresses for IPv6 and IPv4
     let localhost_v4 = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
@@ -43,7 +56,7 @@ fn main() {
 
     while start_time.elapsed() < survey_duration {
         // Placeholder for the time being -- map the sockets to a structure the draw_state function can use to make a table
-        socket_map();
+        socket_map(&ports);
     
         // Placeholder for the time being -- draw table of current socket state
         draw_state();
@@ -65,8 +78,9 @@ fn pinpoint(ip: IpAddr) {
 }
 
 // Match values that are useful according to our configuration
-fn fine_value (si: &SocketInfo) -> bool{
+fn fine_value (si: &SocketInfo, ports: &Vec<i64>) -> bool{
     println!("Fine value.");
+
     match &si.protocol_socket_info {
         ProtocolSocketInfo::Tcp(tcp_si) => println!(
             "TCP {}:{} -> {}:{} {:?} - {}",
@@ -87,7 +101,7 @@ fn fine_value (si: &SocketInfo) -> bool{
 }
 
 // Use netstat to list active network sockets (TCP/UDP) on the local machine, filtered by applicable ports
-fn socket_map(){
+fn socket_map(ports: &Vec<i64>){
     println!("Socket map!");
 
     let af_flags = AddressFamilyFlags::IPV4 | AddressFamilyFlags::IPV6;
@@ -100,7 +114,7 @@ fn socket_map(){
 
     for si in sockets_info {
         //Temp placeholder
-        fine_value(&si);
+        fine_value(&si, &ports);
     }
 
     // Return a vector compatible with the table drawing function
