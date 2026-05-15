@@ -67,7 +67,9 @@ Each iteration will show the state of the server's connections from various remo
 
 ## Configuration
 
-Configuration of specific focus ports can be done in the `src/config.toml`. This is also where additional diagnostic fields are expressed as booleans to expand the capabilities of analyzing each connection.
+Configuration of specific focus ports can be done in the `src/config.toml`. To find the correct ports for your QuickBooks server, open QBServerUtilityMgr -- the tab Port Manager will list all of them.
+
+This is also where additional diagnostic fields are expressed as booleans to expand the capabilities of analyzing each connection.
 
 ## Future Improvements
 
