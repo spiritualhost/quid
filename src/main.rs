@@ -125,7 +125,7 @@ fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
         }
     }
 
-    println!("{:#?}", tcp_info);
+    //println!("{:#?}", tcp_info);
 
     // Return a Vec<SocketInfo> with returned values
     return tcp_info;  
@@ -139,7 +139,8 @@ fn draw_state(connections: &Vec<SocketInfo>){
         source_ip: String,  
         port: u16,
         remote_port: u16,
-        state: String
+        state: String,
+        pid: u32
     }
     
     // Actual live data populates here
@@ -149,6 +150,10 @@ fn draw_state(connections: &Vec<SocketInfo>){
         
         // Destructure through the enum first
         if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
+
+            println!("{:?}", info.associated_pids); 
+
+            //Maybe do some further diagnostics here?
             
             // Populate a structure to append that individual State to the table
             let row_state = State { 
@@ -156,7 +161,8 @@ fn draw_state(connections: &Vec<SocketInfo>){
                 source_ip: tcp_si.remote_addr.to_string(), 
                 port: tcp_si.local_port, 
                 remote_port: tcp_si.remote_port, 
-                state: tcp_si.state.to_string() 
+                state: tcp_si.state.to_string(),
+                pid: info.associated_pids[0]
             };
 
             // Append state to curr_state amalgamation vector
