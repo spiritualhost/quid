@@ -1,1 +1,5 @@
 ports = [ 50461, 50462, 445 ]
+
+[options]
+# Round trip time
+rtt = true
