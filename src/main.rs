@@ -5,7 +5,6 @@ use std::{net::{IpAddr, Ipv4Addr, Ipv6Addr}};
 use tabled::{Table, Tabled};
 use std::{thread, time};
 use clap::Parser;
-use std::collections::HashMap;
 
 mod diagnostics;
 
@@ -37,9 +36,6 @@ fn main() {
         .map(|v| v.into_int().unwrap() as u16)
         .collect();
 
-    //Need to fix this with HashMap to return key:value pairs for config_variable_name:bool from config.toml
-    //let optional_args = configurations.get_array()
-
     // Get localhost addresses for IPv6 and IPv4
     let localhost_v4 = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
     let localhost_v6 = IpAddr::V6(Ipv6Addr::new(0,0,0,0,0,0,0,1));
@@ -66,12 +62,18 @@ fn main() {
         let connections = socket_map(&ports);
     
         // Placeholder for the time being -- draw table of current socket state
-        draw_state(&connections);
+        draw_state(&connections, &configurations);
 
         // Clear the terminal after a wait
         thread::sleep(between_survey);
         clearscreen::clear().expect("Failed to clear screen");
     }
+}
+
+//Extract option values from config.toml and return a hashmap
+fn extract_optionals(config: &Config, key: &str) -> bool {
+    let value = config.get_bool(&key).unwrap();
+    return value; 
 }
 
 // Pinpoint that an IP exists on the accessible subnet (needs better error handling)
@@ -136,7 +138,7 @@ fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
 }
 
 // Draw a table of the current state
-fn draw_state(connections: &Vec<SocketInfo>){
+fn draw_state(connections: &Vec<SocketInfo>, config: &Config){
 
     //Display function for optional fields
     fn display_option(option: &Option<String>) -> String {
@@ -146,6 +148,7 @@ fn draw_state(connections: &Vec<SocketInfo>){
         }
     }
 
+    //Set up State struct to populate table with
     #[derive(Debug, Tabled)]
     pub struct State {
         destination_ip: String,
@@ -167,10 +170,10 @@ fn draw_state(connections: &Vec<SocketInfo>){
         
         // Destructure through the enum first
         if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
-
-            //Further diagnostics here
-            let hostname = Some(diagnostics::get_dns(&tcp_si.remote_addr.to_string()));
-            //let hostname = None::<String>;
+            
+            //This could definitely be made cleaner
+            let dns = extract_optionals(config, "dns");
+            let hostname = if dns == true {Some(diagnostics::get_dns(&tcp_si.remote_addr.to_string()))} else {None::<String>};
             
             // Populate a structure to append that individual State to the table
             let row_state = State { 

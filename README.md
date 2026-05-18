@@ -81,3 +81,4 @@ Use the `config.toml` located in the same directory as the `main.rs` to add or r
 
 - Integration of UDP in a far more robust way
 - Exclusion of columns in final table with None values
+- Improve caching to reduce double-checks

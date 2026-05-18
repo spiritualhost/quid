@@ -1,6 +1,4 @@
 ports = [ 50461, 50462, 445 ]
 
-[options]
 # Set any of the below to 'true' to add them to the survey output table
-rtt = false
 dns = true
