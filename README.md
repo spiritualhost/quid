@@ -71,6 +71,12 @@ Configuration of specific focus ports can be done in the `src/config.toml`. To f
 
 This is also where additional diagnostic fields are expressed as booleans to expand the capabilities of analyzing each connection.
 
+### Additional Diagnostics
+
+Use the `config.toml` located in the same directory as the `main.rs` to add or remove certain diagnostics. Adding diagnostics will naturally add time to each survey. Current options are:
+
+- Hostname lookup (DNS)
+
 ## Future Improvements
 
 * Integration of UDP in a far more robust way

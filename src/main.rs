@@ -152,6 +152,8 @@ fn draw_state(connections: &Vec<SocketInfo>){
         if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
 
             //Maybe do some further diagnostics here?
+            let hostname = diagnostics::get_dns(&tcp_si.remote_addr.to_string());
+            println!("{}", hostname);
             
             // Populate a structure to append that individual State to the table
             let row_state = State { 
