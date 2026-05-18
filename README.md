@@ -42,12 +42,12 @@ Usage: quid.exe [OPTIONS] --survey <SURVEY>
 
 Options:
   -s, --survey <SURVEY>        
-  -t, --t-between <T_BETWEEN>  [default: 1]
+  -t, --t-between <T_BETWEEN>  [default: 5]
   -h, --help                   Print help
   -V, --version                Print version
 ```
 
-The program needs a survey time to run in seconds, which will be the period for which the scan takes place, with an option to define a time between each scan (which will otherwise happen every second for the survey period).
+The program needs a survey time to run in seconds, which will be the period for which the scan takes place, with an option to define a time between each scan (which will otherwise happen every 5 seconds for the survey period and may include a marginal amount of processing time).
 
 At the bare minimum:
 
@@ -79,4 +79,5 @@ Use the `config.toml` located in the same directory as the `main.rs` to add or r
 
 ## Future Improvements
 
-* Integration of UDP in a far more robust way
+- Integration of UDP in a far more robust way
+- Exclusion of columns in final table with None values

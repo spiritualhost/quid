@@ -4,7 +4,8 @@ use netstat::*;
 use std::{net::{IpAddr, Ipv4Addr, Ipv6Addr}};
 use tabled::{Table, Tabled};
 use std::{thread, time};
-use clap::Parser; 
+use clap::Parser;
+use std::collections::HashMap;
 
 mod diagnostics;
 
@@ -17,7 +18,7 @@ struct Args {
     survey: u64,
 
     // Amount of time between scans
-    #[arg(short, long, default_value_t = 1)]
+    #[arg(short, long, default_value_t = 5)]
     t_between: u8,
 }
 
@@ -34,7 +35,10 @@ fn main() {
     let ports: Vec<u16>  = configurations.get_array("ports").unwrap()
         .into_iter()
         .map(|v| v.into_int().unwrap() as u16)
-        .collect();    
+        .collect();
+
+    //Need to fix this with HashMap to return key:value pairs for config_variable_name:bool from config.toml
+    //let optional_args = configurations.get_array()
 
     // Get localhost addresses for IPv6 and IPv4
     let localhost_v4 = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
@@ -48,8 +52,8 @@ fn main() {
 
     pinpoint(local_ip);
 
-    let bad_ip = "192.168.200.254".parse().unwrap();
-    pinpoint(bad_ip);
+    //let bad_ip = "192.168.200.254".parse().unwrap();
+    //pinpoint(bad_ip);
 
     // Time constraints so the survey runs for a predetermined period
     let between_survey = time::Duration::from_secs(args.t_between as u64);
@@ -133,14 +137,27 @@ fn socket_map(ports: &Vec<u16>) -> Vec<SocketInfo>{
 
 // Draw a table of the current state
 fn draw_state(connections: &Vec<SocketInfo>){
-    #[derive(Tabled)]
-    struct State {
+
+    //Display function for optional fields
+    fn display_option(option: &Option<String>) -> String {
+        match option {
+            Some(s) => format!("{}", s),
+            None => format!("-"),
+        }
+    }
+
+    #[derive(Debug, Tabled)]
+    pub struct State {
         destination_ip: String,
         source_ip: String,  
         port: u16,
         remote_port: u16,
         state: String,
-        pid: u32
+        pid: u32,
+
+        //Optional diagnostic fields -- become None if missing (i.e., set to false in config)
+        #[tabled(display = "display_option")]
+        hostname: Option<String>,
     }
     
     // Actual live data populates here
@@ -151,9 +168,9 @@ fn draw_state(connections: &Vec<SocketInfo>){
         // Destructure through the enum first
         if let ProtocolSocketInfo::Tcp(tcp_si) = &info.protocol_socket_info{
 
-            //Maybe do some further diagnostics here?
-            let hostname = diagnostics::get_dns(&tcp_si.remote_addr.to_string());
-            println!("{}", hostname);
+            //Further diagnostics here
+            let hostname = Some(diagnostics::get_dns(&tcp_si.remote_addr.to_string()));
+            //let hostname = None::<String>;
             
             // Populate a structure to append that individual State to the table
             let row_state = State { 
@@ -162,7 +179,10 @@ fn draw_state(connections: &Vec<SocketInfo>){
                 port: tcp_si.local_port, 
                 remote_port: tcp_si.remote_port, 
                 state: tcp_si.state.to_string(),
-                pid: info.associated_pids[0]
+                pid: info.associated_pids[0],
+
+                //Optional Fields
+                hostname: hostname,
             };
 
             // Append state to curr_state amalgamation vector

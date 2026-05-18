@@ -1,10 +1,7 @@
 // Separation of logic for connection diagnostics
 use dns_lookup::lookup_addr;
 
-// Get round trip time for the connection
-fn get_rtt(){
-    return; 
-}
+#[allow(dead_code)] //So warnings are suppressed for unused fields
 
 // Return DNS hostname information
 pub fn get_dns(ip: &str) -> String {
